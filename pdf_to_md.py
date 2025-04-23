@@ -3,13 +3,18 @@ import requests
 import time
 from typing import Tuple
 
+from dotenv import load_dotenv
+
+
+load_dotenv()
+
 class PDFToMarkdownConverter:
     def __init__(self, mathpix_id: str, mathpix_key: str):
         """
         Инициализация конвертера PDF в Markdown с использованием Mathpix PDF API
         """
-        self.mathpix_id = mathpix_id
-        self.mathpix_key = mathpix_key
+        self.mathpix_id = os.getenv('MATHPIX_ID')
+        self.mathpix_key = os.getenv('MATHPIX_KEY')
         self.base_url = "https://api.mathpix.com/v3"
 
     def _upload_pdf(self, pdf_path: str) -> str:

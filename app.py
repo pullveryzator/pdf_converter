@@ -1,19 +1,30 @@
 import os
 from flask import Flask, render_template, request, send_file, redirect
+from dotenv import load_dotenv
 from werkzeug.utils import secure_filename
 
 from pdf_to_md import PDFToMarkdownConverter
 from md_to_xlsx import MarkdownToExcelConverter
 
-app = Flask(__name__)
-app.config['UPLOAD_FOLDER'] = 'uploads'
-app.config['OUTPUT_FOLDER'] = 'outputs'
-app.config['ALLOWED_EXTENSIONS'] = {'pdf'}
-app.config['MATHPIX_ID'] = 'MATHPIX_ID'
-app.config['MATHPIX_KEY'] = 'MATHPIX_KEY'
+load_dotenv()
 
-os.makedirs(app.config['UPLOAD_FOLDER'], exist_ok=True)
-os.makedirs(app.config['OUTPUT_FOLDER'], exist_ok=True)
+def create_app():
+    app = Flask(__name__)
+
+    app.config['UPLOAD_FOLDER'] = os.getenv('UPLOAD_FOLDER', 'uploads')
+    app.config['OUTPUT_FOLDER'] = os.getenv('OUTPUT_FOLDER', 'outputs')
+    app.config['MATHPIX_ID'] = os.getenv('MATHPIX_ID')
+    app.config['MATHPIX_KEY'] = os.getenv('MATHPIX_KEY')
+    
+    allowed_ext = os.getenv('ALLOWED_EXTENSIONS', 'pdf').split(',')
+    app.config['ALLOWED_EXTENSIONS'] = set(ext.strip() for ext in allowed_ext)
+    
+    os.makedirs(app.config['UPLOAD_FOLDER'], exist_ok=True)
+    os.makedirs(app.config['OUTPUT_FOLDER'], exist_ok=True)
+    
+    return app
+
+app = create_app()
 
 def allowed_file(filename):
     return '.' in filename and \
